@@ -62,9 +62,9 @@ class Game:
                     self.message = "invalid move" + str(
                         target.availableMoves(startpos[0], startpos[1], self.gameboard)
                     )
-                    print(
-                        target.availableMoves(startpos[0], startpos[1], self.gameboard)
-                    )
+                    # print(
+                    #     target.availableMoves(startpos[0], startpos[1], self.gameboard)
+                    # )
             else:
                 self.message = "there is no piece in that space"
 
@@ -97,7 +97,6 @@ class Game:
             
             a = ((ord(a[0]) - 97), int(a[1]) - 1)
             b = (ord(b[0]) - 97, int(b[1]) - 1)
-            print(a, b)
             return (a, b)
         except:
             print("error decoding input. please try again")
