@@ -34,6 +34,11 @@ class Game:
             print(self.message)
             self.message = ""
             startpos, endpos = self.parseInput()
+            # exit method 
+            if startpos == "exit" and endpos =="game":
+                if input("Are you want to exit game(reply yes or no)") == "yes":
+                    break
+
             try:
                 target = self.gameboard[startpos]
             except:
@@ -88,6 +93,10 @@ class Game:
     def parseInput(self):
         try:
             a, b = input().split()
+            # exit method
+            if a =="exit" and b =="game":
+                return (a, b)
+            
             a = ((ord(a[0]) - 97), int(a[1]) - 1)
             b = (ord(b[0]) - 97, int(b[1]) - 1)
             print(a, b)
@@ -113,14 +122,6 @@ class Game:
             print()
         print("-" * 32)
 
-    """game class. contains the following members and methods:
-    two arrays of pieces for each player
-    8x8 piece array with references to these pieces
-    a parse function, which turns the input from the user into a list of two tuples denoting start and end points
-    a checkmateExists function which checks if either players are in checkmate
-    a checkExists function which checks if either players are in check (woah, I just got that nonsequitur)
-    a main loop, which takes input, runs it through the parser, asks the piece if the move is valid, and moves the piece if it is. if the move conflicts with another piece, that piece is removed. ischeck(mate) is run, and if there is a checkmate, the game prints a message as to who wins
-    """
 
 class Piece:
     def __init__(self, color, name):
