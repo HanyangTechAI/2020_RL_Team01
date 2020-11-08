@@ -25,7 +25,6 @@ class Game:
         for i in range(0, 8):
             self.gameboard[(i, 0)] = placers[i](WHITE, uniDict[WHITE][white_placers[i]])
             self.gameboard[((7 - i), 7)] = placers[i](BLACK, uniDict[BLACK][black_placers[i]])
-        placers.reverse()
 
     def main(self):
 
@@ -35,7 +34,7 @@ class Game:
             self.message = ""
             startpos, endpos = self.parseInput()
             # exit method 
-            if startpos == "exit" and endpos =="game":
+            if startpos == "exit" and endpos == "game":
                 if input("Are you want to exit game(reply yes or no)") == "yes":
                     break
 
@@ -70,7 +69,6 @@ class Game:
                 self.message = "there is no piece in that space"
 
     def isCheck(self):
-        # ascertain where the kings are, check all pieces of opposing color against those kings, then if either get hit, check if its checkmate
         kingDict = {}
         pieceDict = {BLACK: [], WHITE: []}
         for position, piece in self.gameboard.items():
@@ -260,7 +258,6 @@ class Pawn(Piece):
     def __init__(self, color, name, direction):
         self.name = name
         self.Color = color
-        # of course, the smallest piece is the hardest to code. direction should be either 1 or -1, should be -1 if the pawn is traveling "backwards"
         self.direction = direction
 
     def availableMoves(self, x, y, gameboard, Color=None):
@@ -278,7 +275,12 @@ class Pawn(Piece):
         if (x, y + self.direction) not in gameboard and Color == self.Color:
             answers.append(
                 (x, y + self.direction)
-            )  # the condition after the and is to make sure the non-capturing movement (the only fucking one in the game) is not used in the calculation of checkmate
+            )
+        if y in [1,6] and (x, y + self.direction) not in gameboard and Color == self.Color:
+            answers.append(
+                (x, y + 2*self.direction)
+            )
+
         return answers
 
 
