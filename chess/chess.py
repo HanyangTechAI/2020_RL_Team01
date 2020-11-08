@@ -19,10 +19,12 @@ class Game:
             self.gameboard[(i, 6)] = Pawn(BLACK, uniDict[BLACK][Pawn], -1)
 
         placers = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
+        white_placers = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
+        black_placers = [Rook, Knight, Bishop, King, Queen, Bishop, Knight, Rook]
 
         for i in range(0, 8):
-            self.gameboard[(i, 0)] = placers[i](WHITE, uniDict[WHITE][placers[i]])
-            self.gameboard[((7 - i), 7)] = placers[i](BLACK, uniDict[BLACK][placers[i]])
+            self.gameboard[(i, 0)] = placers[i](WHITE, uniDict[WHITE][white_placers[i]])
+            self.gameboard[((7 - i), 7)] = placers[i](BLACK, uniDict[BLACK][black_placers[i]])
         placers.reverse()
 
     def main(self):
@@ -64,7 +66,6 @@ class Game:
 
     def isCheck(self):
         # ascertain where the kings are, check all pieces of opposing color against those kings, then if either get hit, check if its checkmate
-        king = King
         kingDict = {}
         pieceDict = {BLACK: [], WHITE: []}
         for position, piece in self.gameboard.items():
