@@ -31,6 +31,10 @@ class Game:
         while True:
             self.printBoard()
             print(self.message)
+            if self.playersturn == "white":
+                print("black's turn")
+            else:
+                print("white's turn")
             self.message = ""
             startpos, endpos = self.parseInput()
             # exit method 
