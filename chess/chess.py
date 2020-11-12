@@ -21,13 +21,14 @@ class Game:
             self.gameboard[(i, 1)] = Pawn(WHITE, uniDict[WHITE][Pawn], 1)
             self.gameboard[(i, 6)] = Pawn(BLACK, uniDict[BLACK][Pawn], -1)
 
-        placers = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
         white_placers = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
         black_placers = [Rook, Knight, Bishop, King, Queen, Bishop, Knight, Rook]
 
         for i in range(0, 8):
-            self.gameboard[(i, 0)] = placers[i](WHITE, uniDict[WHITE][white_placers[i]])
-            self.gameboard[((7 - i), 7)] = placers[i](
+            self.gameboard[(i, 0)] = white_placers[i](
+                WHITE, uniDict[WHITE][white_placers[i]]
+            )
+            self.gameboard[((7 - i), 7)] = black_placers[i](
                 BLACK, uniDict[BLACK][black_placers[i]]
             )
 
@@ -37,9 +38,9 @@ class Game:
             self.printBoard()
             print(self.message)
             if self.playersturn == "white":
-                print("black's turn")
-            else:
                 print("white's turn")
+            else:
+                print("black's turn")
             self.message = ""
             startpos, endpos = self.parseInput()
             # exit method
@@ -53,6 +54,7 @@ class Game:
                 self.message = "could not find piece; index probably out of range"
                 target = None
 
+
             if target:
                 print("found " + str(target))
                 if target.Color != self.playersturn:
@@ -62,6 +64,10 @@ class Game:
                     self.message = "that is a valid move"
                     self.gameboard[endpos] = self.gameboard[startpos]
                     del self.gameboard[startpos]
+                    if self.gameover():
+                        print(f"{self.playersturn} win the game")
+                        break
+
                     self.isCheck()
                     if self.playersturn == BLACK:
                         self.playersturn = WHITE
@@ -76,6 +82,14 @@ class Game:
                     # )
             else:
                 self.message = "there is no piece in that space"
+
+    def gameover(self):
+        count=0
+        for _, piece in self.gameboard.items():
+            if type(piece) == King:
+                count +=1
+
+        return count != 2
 
     def isCheck(self):
         kingDict = {}
@@ -131,6 +145,7 @@ class Game:
     def run(self):
         self.placePieces()
         print("chess start. if you want to exit game type 'exit game'")
+        print("left player is white right player is black")
         self.main()
 
 
