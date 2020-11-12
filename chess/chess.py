@@ -132,15 +132,16 @@ class Game:
         return True"""
 
     def printBoard(self):
-        print("  1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |")
+        print("   1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |")
         for i in range(0, 8):
-            print("-" * 32)
+            print("-" * 40)
             print(chr(i + 97), end="|")
             for j in range(0, 8):
                 item = self.gameboard.get((i, j), " ")
                 print(str(item) + " |", end=" ")
-            print()
-        print("-" * 32)
+            print(chr(i + 97))
+        print("-" * 40)
+        print("   1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |")
 
     def run(self):
         self.placePieces()
