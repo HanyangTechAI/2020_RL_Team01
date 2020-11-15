@@ -1,4 +1,6 @@
-from piece import Pawn, Rook, Knight, Bishop, King, Queen
+from random import choice
+
+from piece import Bishop, King, Knight, Pawn, Queen, Rook
 
 WHITE = "white"
 BLACK = "black"
@@ -14,6 +16,15 @@ class Game:
         self.playersturn = BLACK
         self.message = "this is where prompts will go"
         self.gameboard = {}
+        print(
+            """mode select
+        1:  human vs human 
+        2:  human vs computer
+        3:  computer vs human
+        4:  computer vs computer
+        """
+        )
+        self.mode = int(input())
 
     def placePieces(self):
 
@@ -33,16 +44,26 @@ class Game:
             )
 
     def main(self):
-
+        turn = 0
         while True:
+            turn += 1
+            print(f"turn is {turn}")
             self.printBoard()
             print(self.message)
             if self.playersturn == "white":
+                if self.mode in [1, 2]:
+                    startpos, endpos = self.parseInput()
+                else:
+                    startpos, endpos = self.autoInput(self.playersturn)
                 print("white's turn")
             else:
+                if self.mode in [1, 3]:
+                    startpos, endpos = self.parseInput()
+                else:
+                    startpos, endpos = self.autoInput(self.playersturn)
                 print("black's turn")
             self.message = ""
-            startpos, endpos = self.parseInput()
+
             # exit method
             if startpos == "exit" and endpos == "game":
                 if input("Are you want to exit game(reply yes or no)") == "yes":
@@ -54,9 +75,8 @@ class Game:
                 self.message = "could not find piece; index probably out of range"
                 target = None
 
-
             if target:
-                print("found " + str(target))
+                # print("found " + str(target))
                 if target.Color != self.playersturn:
                     self.message = "you aren't allowed to move that piece this turn"
                     continue
@@ -84,10 +104,10 @@ class Game:
                 self.message = "there is no piece in that space"
 
     def gameover(self):
-        count=0
+        count = 0
         for _, piece in self.gameboard.items():
             if type(piece) == King:
-                count +=1
+                count += 1
 
         return count != 2
 
@@ -124,6 +144,26 @@ class Game:
         except:
             print("error decoding input. please try again")
             return ((-1, -1), (-1, -1))
+
+    def autoInput(self, Color):
+        piecelist = []
+        for position, piece in self.gameboard.items():
+            if piece.Color == self.playersturn:
+                piecelist.append((piece, position))
+        for _ in range(100):
+            rand_start = choice(piecelist)
+            position = rand_start[1]
+            piece = rand_start[0]
+            available_list = piece.availableMoves(
+                position[0], position[1], self.gameboard, Color
+            )
+            if not available_list:
+                continue
+            rand_end = choice(available_list)
+
+            print("computer played", position, rand_end)
+
+            return position, rand_end
 
     """def validateInput(self, *kargs):
         for arg in kargs:
