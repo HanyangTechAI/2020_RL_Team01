@@ -1,10 +1,10 @@
 import numpy as np
 import pandas as pd
 
-from hai import Hai
+from random_agent import RandomAgent
 
 
-class Othello(Hai):
+class Othello():
     # White: 1, Black: 2
 
     board = np.zeros((8, 8))
@@ -22,7 +22,7 @@ class Othello(Hai):
         self.player = 0
 
     def select_mode(self):
-        print('\nSelect Mode\n\n1: Human vs HAI\t2: HAI vs HAI')
+        print('\nSelect Mode\n\n1: Human vs Random Agent\t2: RandomAgent vs Random Agent')
 
         mode_1 = int(input())
 
@@ -264,10 +264,10 @@ class Othello(Hai):
     def game_run(self):
 
         if self.mode == 1:
-            agent = Hai()
+            agent = RandomAgent()
         elif self.mode == 2:
-            agent1 = Hai()  # White
-            agent2 = Hai()  # Black
+            agent1 = RandomAgent()  # White
+            agent2 = RandomAgent()  # Black
 
         while not self.game_end:
 
