@@ -71,7 +71,8 @@ class Othello(Hai):
         pos_list = pos.copy()
 
         # up, down, left, right, ...
-        directions = [[0, 1], [0, -1], [-1, 0], [1, 0], [1, 1], [1, -1], [-1, -1], [-1, 1]]
+        directions = [[0, 1], [0, -1], [-1, 0],
+                      [1, 0], [1, 1], [1, -1], [-1, -1], [-1, 1]]
 
         for curr_pos in pos_list:
 
@@ -129,7 +130,8 @@ class Othello(Hai):
             turn = 2
             oppose = 1
 
-        directions = [[0, 1], [0, -1], [-1, 0], [1, 0], [1, 1], [1, -1], [-1, -1], [-1, 1]]
+        directions = [[0, 1], [0, -1], [-1, 0],
+                      [1, 0], [1, 1], [1, -1], [-1, -1], [-1, 1]]
 
         for x_dir, y_dir in directions:
             # new_pos = curr_pos + dir
@@ -178,7 +180,8 @@ class Othello(Hai):
     def player_input(self, avail_list):
 
         # avail_list = self.get_avail_pos()
-        print('\nAvailable Positions: ', avail_list, '\n\nDrop the stone ({}\'s turn)\t(e.g. 0 1):'.format(self.turn))
+        print('\nAvailable Positions: ', avail_list,
+              '\n\nDrop the stone ({}\'s turn)\t(e.g. 0 1):'.format(self.turn))
         loc = list(map(int, input().split()))
 
         while True:
@@ -246,7 +249,8 @@ class Othello(Hai):
                 print('★★★ Draw ★★★')
 
             self.show_board()
-            print('\nWhite: {} / Black: {}'.format(np.sum(self.board == 1), np.sum(self.board == 2)))
+            print('\nWhite: {} / Black: {}'.format(np.sum(self.board == 1),
+                                                   np.sum(self.board == 2)))
 
     def show_board(self):
 
