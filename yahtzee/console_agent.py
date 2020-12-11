@@ -1,15 +1,16 @@
 from .scoreboard import UpperSection, LowerSection, number_to_category
 from .game import Game
-from .agent import StateCategorizedAgent
+from .agent import StateAgent
 import os
 import platform
 
 
-class ConsoleAgent(StateCategorizedAgent):
+class ConsoleAgent(StateAgent):
     @staticmethod
     def __clear_console():
         if platform.system() == 'Windows':
             os.system('cls')
+            return
         else:
             os.system('clear')
 
@@ -21,7 +22,7 @@ class ConsoleAgent(StateCategorizedAgent):
             if game.scoreboard[number_to_category(select)] is not None:
                 select = 0
                 print('빈 곳을 입력해주세요')
-        return number_to_category(select)
+        return select
 
     def __init__(self):
         super().__init__()
@@ -38,12 +39,16 @@ class ConsoleAgent(StateCategorizedAgent):
         while re_roll != 'n' and re_roll != 'y':
             re_roll = input('다시 굴리겠습니까? (Y/N)').lower()
             if re_roll == 'n':
-                return []
+                return 0
             elif re_roll == 'y':
                 print('어떤 주사위들을 다시 굴리시겠습니까? (1~5, 여러개 입력 가능)')
                 select = set(list(map(int, input().split())))
                 select = [v - 1 for v in select if 1 <= v <= 5]
-                return select
+                action = 0
+                for i in select:
+                    action += 2**i
+                print('action: ', action)
+                return action
             else:
                 print('(Y/N) 중 하나를 입력해주세요.')
 

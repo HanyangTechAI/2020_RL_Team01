@@ -18,6 +18,10 @@ class Dices:
     def have_rolled(self):
         return self.__rollCount > 0
 
+    @property
+    def roll_cnt(self):
+        return int(self.__rollCount)
+
     def roll_all(self):
         assert self.can_roll
 
