@@ -4,11 +4,11 @@ import torch.nn as nn
 from .agent import Agent
 from .game import Game
 import tensorboardX
+import argparse
 
 NUM_STATE = 14 + 5 + 1 + 1  # scoreboard + dice + dice_roll_cnt + state_num
 NUM_ACTION = 32             # dice selection(32), scoreboard selection(max 14)
 
-LR = 0.00003
 EPISODE = 10000
 BATCH_SIZE = 128
 GAMMA = 0.7
@@ -61,15 +61,21 @@ class Net(nn.Module):
 
 
 class DQNAgent(Agent):
-    def __init__(self):
+    def __init__(self, lr, model=None):
         super().__init__()
         self.transitions = np.zeros((TRANSITIONS_CAPACITY, 2 * NUM_STATE + 2))
         self.transitions_index = 0
         self.learn_iter = 0
 
-        self.Q, self.Q_ = Net().to(device), Net().to(device)
+        self.Q, self.Q_ = Net(), Net()
+        if model is not None:
+            loaded_model = torch.load(model)
+            self.Q.load_state_dict(loaded_model)
+            self.Q_.load_state_dict(loaded_model)
+            print('loaded ' + model)
+        self.Q, self.Q_ = self.Q.to(device), self.Q_.to(device)
 
-        self.optimizer = torch.optim.Adam(self.Q.parameters(), lr=LR)
+        self.optimizer = torch.optim.Adam(self.Q.parameters(), lr=lr)
         self.criteria = nn.MSELoss().to(device)
 
     def choose_action(self, x, game: Game, color, epsilon=0.1):
@@ -133,7 +139,12 @@ class DQNAgent(Agent):
 
 
 if __name__ == "__main__":
-    agent = DQNAgent()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model', type=str, default=None, required=False)
+    parser.add_argument('--lr', type=float, default=0.00003)
+    args = parser.parse_args()
+
+    agent = DQNAgent(args.lr, args.model)
     scores = []
 
     for episode in range(EPISODE * 50):
