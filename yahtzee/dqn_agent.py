@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 from .agent import Agent
 from .game import Game
+from .scoreboard import number_to_category
 import tensorboardX
 import argparse
 
@@ -61,7 +62,7 @@ class Net(nn.Module):
 
 
 class DQNAgent(Agent):
-    def __init__(self, lr, model=None):
+    def __init__(self, lr=1e-6, model=None):
         super().__init__()
         self.transitions = np.zeros((TRANSITIONS_CAPACITY, 2 * NUM_STATE + 2))
         self.transitions_index = 0
@@ -75,8 +76,9 @@ class DQNAgent(Agent):
             print('loaded ' + model)
         self.Q, self.Q_ = self.Q.to(device), self.Q_.to(device)
 
-        self.optimizer = torch.optim.Adam(self.Q.parameters(), lr=lr)
-        self.criteria = nn.MSELoss().to(device)
+        if model is None:
+            self.optimizer = torch.optim.Adam(self.Q.parameters(), lr=lr)
+            self.criteria = nn.MSELoss().to(device)
 
     def choose_action(self, x, game: Game, color, epsilon=0.1):
         available_actions = np.array(game.get_valid_actions(), dtype='int32')
@@ -142,35 +144,83 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, default=None, required=False)
     parser.add_argument('--lr', type=float, default=0.00003)
+    parser.add_argument('--train', type=int, default=1)
     args = parser.parse_args()
 
-    agent = DQNAgent(args.lr, args.model)
-    scores = []
+    if args.train == 1:
+        agent = DQNAgent(args.lr, args.model)
+        scores = []
 
-    for episode in range(EPISODE * 50):
+        for episode in range(EPISODE * 50):
+            game = Game()
+            game.reset()
+            while True:
+                s = np.array(game.get_state(), dtype='int32')
+                a = agent.choose_action(s, game, 1)
+                score_bef = game.scoreboard.total_score
+                game.add(a)
+                # r = game.scoreboard.total_score - score_bef
+                r = game.scoreboard.total_score
+                s_ = np.array(game.get_state(), dtype='int32')
+
+                agent.store_transition(s, a, r, s_)
+
+                if game.scoreboard.is_fulfilled:
+                    agent.learn(episode)
+                    print('Episode:{} | score:{}'.format(episode, game.scoreboard.total_score))
+                    scores.append(game.scoreboard.total_score)
+                    break
+
+            if (episode + 1) % 100 == 0:
+                torch.save(agent.Q.state_dict(), 'model.pth')
+
+                writer.add_scalar('score', sum(scores)/len(scores), episode)
+                scores = []
+        writer.close()
+
+    else:
+        agent = DQNAgent(model=args.model)
         game = Game()
         game.reset()
-        while True:
+
+        while not game.scoreboard.is_fulfilled:
             s = np.array(game.get_state(), dtype='int32')
             a = agent.choose_action(s, game, 1)
-            score_bef = game.scoreboard.total_score
-            game.add(a)
-            # r = game.scoreboard.total_score - score_bef
-            r = game.scoreboard.total_score
-            s_ = np.array(game.get_state(), dtype='int32')
 
-            agent.store_transition(s, a, r, s_)
+            if game.state == Game.State.Rolling:
+                choice = game.action_to_dice_choices(a)
+                print('current dices:')
+                print(game.dices.array)
+                print('AI choice:')
+                print(choice)
+                print()
+                game.add(a)
+            elif game.state == Game.State.Choosing:
+                game.add(a)
+                print('current dices:')
+                print(game.dices.array)
+                category = number_to_category(a)
+                print('AI choice:')
+                print(category.name)
+                print('current scores:')
+                print(str(game))
+                print()
+            elif game.state == Game.State.ChooseInLower:
+                game.add(a)
+                category = number_to_category(a)
+                print('AI choice in LowerSection:')
+                print(category.name)
+                print('current scores:')
+                print(str(game))
+                print()
+            elif game.state == Game.State.ChooseInUpper:
+                game.add(a)
+                category = number_to_category(a)
+                print('AI choice in UpperSection:')
+                print(category.name)
+                print('current scores:')
+                print(str(game))
+                print()
 
-            if game.scoreboard.is_fulfilled:
-                agent.learn(episode)
-                print('Episode:{} | score:{}'.format(episode, game.scoreboard.total_score))
-                scores.append(game.scoreboard.total_score)
-                break
 
-        if (episode + 1) % 100 == 0:
-            torch.save(agent.Q.state_dict(), 'model.pth')
-
-            writer.add_scalar('score', sum(scores)/len(scores), episode)
-            scores = []
-    writer.close()
 

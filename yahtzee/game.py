@@ -88,7 +88,7 @@ class Game:
         self.state = Game.State.Rolling
         self.dices.roll_all()
 
-    def __action_to_dice_choices(self, n):
+    def action_to_dice_choices(self, n):
         choices = []
         for i in range(len(self.dices)):
             if n % 2 == 1:
@@ -98,7 +98,7 @@ class Game:
 
     def add(self, action):
         if self.state == Game.State.Rolling:
-            choice = self.__action_to_dice_choices(action)
+            choice = self.action_to_dice_choices(action)
             assert isinstance(choice, list)
             if len(choice) == 0:
                 self.state = Game.State.Choosing
@@ -118,6 +118,9 @@ class Game:
                     self.state = Game.State.ChooseInLower
                 elif result == Scoreboard.YahtzeeResult.ChooseInUpper:
                     self.state = Game.State.ChooseInUpper
+                else:
+                    self.state = Game.State.Rolling
+                    self.dices.reset()
             else:
                 self.scoreboard.score(choice, dices_arr)
                 self.state = Game.State.Rolling
