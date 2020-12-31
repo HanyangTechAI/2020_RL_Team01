@@ -11,7 +11,7 @@ class Agent(metaclass=ABCMeta):
         pass
 
 
-class StateCategorizedAgent(Agent):
+class StateAgent(Agent):
     def next(self, game: Game):
         if game.state == Game.State.Rolling:
             return self._next_rolling(game)
