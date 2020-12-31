@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class RandomAgent:
+class Hai:
     # AI Agent
 
     def __init__(self):
